@@ -7,3 +7,6 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <GLES2/gl2platform.h>
+
+#include <android/log.h>
+#define ALICE_LOG_TAG "LearnAliceLogTag"
