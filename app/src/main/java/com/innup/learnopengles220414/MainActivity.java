@@ -16,6 +16,7 @@ public class  MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private GLSurfaceView glSurfaceView;
+    private static MainActivity self;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -26,17 +27,17 @@ public class  MainActivity extends AppCompatActivity {
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            gl.glClearColor(0.1f, 0.4f, 0.6f, 1f);
+            MainActivity.getInstance().onSurfaceCreated();
         }
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            gl.glViewport(0, 0, width, height);
+            MainActivity.getInstance().onSurfaceChanged(width, height);
         }
 
         @Override
         public void onDrawFrame(GL10 gl) {
-            gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+            MainActivity.getInstance().onDrawFrame();
         }
     }
 
@@ -56,8 +57,13 @@ public class  MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        self = this;
         glSurfaceView = new AliceGLSurfaceView(getApplicationContext());
         setContentView(glSurfaceView);
+    }
+
+    public static MainActivity getInstance(){
+        return self;
     }
 
     /**
@@ -66,5 +72,9 @@ public class  MainActivity extends AppCompatActivity {
      */
     public native String stringFromJNI();
     public native String testScence();
+
+    public native void onSurfaceCreated();
+    public native void onSurfaceChanged(int width, int height);
+    public native void onDrawFrame();
 
 }
