@@ -10,3 +10,6 @@
 
 #include <android/log.h>
 #define ALICE_LOG_TAG "LearnAliceLogTag"
+
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>

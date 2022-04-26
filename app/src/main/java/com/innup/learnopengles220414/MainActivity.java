@@ -3,6 +3,7 @@ package com.innup.learnopengles220414;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,7 +28,7 @@ public class  MainActivity extends AppCompatActivity {
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            MainActivity.getInstance().onSurfaceCreated();
+            MainActivity.getInstance().onSurfaceCreated(MainActivity.getInstance().getAssets());
         }
 
         @Override
@@ -73,7 +74,7 @@ public class  MainActivity extends AppCompatActivity {
     public native String stringFromJNI();
     public native String testScence();
 
-    public native void onSurfaceCreated();
+    public native void onSurfaceCreated(AssetManager assetManager);
     public native void onSurfaceChanged(int width, int height);
     public native void onDrawFrame();
 
