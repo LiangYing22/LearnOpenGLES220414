@@ -33,6 +33,6 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceChanged(JNIEnv *env, jo
 }
 extern "C" JNIEXPORT void JNICALL
 Java_com_innup_learnopengles220414_MainActivity_onDrawFrame(JNIEnv *env, jobject thiz) {
-//    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "onDrawFrame");
+    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "onDrawFrame %f", GetFrameTime());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }

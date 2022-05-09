@@ -2,8 +2,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <jni.h>
 #include <iostream>
+#include <string>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <GLES2/gl2platform.h>
