@@ -17,6 +17,25 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "onSurfaceCreated");
     sAssetManager = AAssetManager_fromJava(env, am);
     glClearColor(0.1f, 0.4f, 0.6f, 1.0f);
+    //定义三个顶点（每个顶点有四个坐标），此时定位的数据还在 CPU 上。
+    Vertice vertices[3];
+    //设置第一个顶点数据
+    vertices[0].mPosition[0] = -0.5f;
+    vertices[0].mPosition[1] = -0.5f;
+    vertices[0].mPosition[2] = -2.0f;
+    vertices[0].mPosition[3] = 1.0f;
+    //设置第二个顶点数据
+    vertices[1].mPosition[0] = 0.5f;
+    vertices[1].mPosition[1] = -0.5f;
+    vertices[1].mPosition[2] = -2.0f;
+    vertices[1].mPosition[3] = 1.0f;
+    //设置第三个顶点数据
+    vertices[2].mPosition[0] = 0.0f;
+    vertices[2].mPosition[1] = 0.5f;
+    vertices[2].mPosition[2] = -2.0f;
+    vertices[2].mPosition[3] = 1.0f;
+
+
     int fileSize = 0;
     unsigned char * fileContent = LoadFileContent(sAssetManager, "test.txt", fileSize);
     if(fileContent != nullptr){
