@@ -13,6 +13,28 @@ unsigned  char* LoadFileContent(AAssetManager *sAssetManager, const char* path, 
     return fileContent;
 }
 
+GLuint CompileShader(GLenum shader_type, const char *source_code){
+    //指定类型创建一个 shader
+    GLuint shader_to_ret = glCreateShader(shader_type);
+    //链接 shader 源码，传入参数分别为：shader、1份代码、代码的内容、代码的长度（能够推断出来，直接传空就行）
+    glShaderSource(shader_to_ret, 1, &source_code, nullptr);
+    //编译 shader
+    glCompileShader(shader_to_ret);
+    //查看 shader 编译结果
+    GLint compile_result = GL_TRUE;
+    glGetShaderiv(shader_to_ret, GL_COMPILE_STATUS, &compile_result);
+    if(compile_result == GL_FALSE){
+        //打印编译错误日志
+        char szLog[1024] = {0};
+        GLsizei logLen = 0;
+        glGetShaderInfoLog(shader_to_ret, 1024, &logLen, szLog);
+        __android_log_print(ANDROID_LOG_ERROR, ALICE_LOG_TAG, "CompileShader %s\ncode:\n%s", szLog, source_code);
+        glDeleteShader(shader_to_ret);
+        shader_to_ret = 0;
+    }
+    return shader_to_ret;
+}
+
 float GetFrameTime(){
     //无论这个函数执行多少次，下面 static 初始化代码只会执行一次
     static unsigned long long lastTime = 0, currentTime = 0;

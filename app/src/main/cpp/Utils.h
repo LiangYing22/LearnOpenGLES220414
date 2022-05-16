@@ -8,5 +8,7 @@ struct Vertice{
 
 unsigned  char* LoadFileContent(AAssetManager *sAssetManager, const char* path, int& fileSize);
 
+GLuint CompileShader(GLenum shader_type, const char *source_code);
+
 float GetFrameTime();
 
