@@ -10,5 +10,9 @@ unsigned  char* LoadFileContent(AAssetManager *sAssetManager, const char* path, 
 
 GLuint CompileShader(GLenum shader_type, const char *source_code);
 
+GLuint CreateProgram(GLuint vertex_shader, GLuint fragment_shader);
+
+GLuint CreateStandardProgram(AAssetManager *sAssetManager, const char *vertex_shader_path, const char *fragment_shader_path);
+
 float GetFrameTime();
 

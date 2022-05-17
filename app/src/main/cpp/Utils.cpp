@@ -35,6 +35,42 @@ GLuint CompileShader(GLenum shader_type, const char *source_code){
     return shader_to_ret;
 }
 
+GLuint CreateProgram(GLuint vertex_shader, GLuint fragment_shader){
+    GLuint program_to_ret = glCreateProgram();
+    glAttachShader(program_to_ret, vertex_shader);
+    glAttachShader(program_to_ret, fragment_shader);
+    glLinkProgram(program_to_ret);
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
+    GLint link_result = GL_TRUE;
+    glGetProgramiv(program_to_ret, GL_LINK_STATUS, &link_result);
+    if(GL_FALSE == link_result){
+        char szLog[1024] = {0};
+        GLsizei logLen = 0;
+        glGetShaderInfoLog(program_to_ret, 1024, &logLen, szLog);
+        __android_log_print(ANDROID_LOG_ERROR, ALICE_LOG_TAG, "CreateProgram %s\n", szLog);
+        glDeleteProgram(program_to_ret);
+        program_to_ret = 0;
+    }
+    return program_to_ret;
+}
+
+GLuint CreateStandardProgram(AAssetManager *sAssetManager, const char *vertex_shader_path, const char *fragment_shader_path){
+    int fileSize = 0;
+    unsigned char *fileContent = LoadFileContent(sAssetManager, vertex_shader_path, fileSize);
+    GLuint vsShader = CompileShader(GL_VERTEX_SHADER, (char *)fileContent);
+    delete [] fileContent;
+    fileContent = LoadFileContent(sAssetManager, fragment_shader_path, fileSize);
+    GLuint fsShader = CompileShader(GL_FRAGMENT_SHADER, (char *)fileContent);
+    delete [] fileContent;
+    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "vs:%u  fs:%u\n", vsShader, fsShader);
+    GLuint program = CreateProgram(vsShader, fsShader);
+    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "program:%u\n", program);
+    glDeleteShader(vsShader);
+    glDeleteShader(fsShader);
+    return program;
+}
+
 float GetFrameTime(){
     //无论这个函数执行多少次，下面 static 初始化代码只会执行一次
     static unsigned long long lastTime = 0, currentTime = 0;

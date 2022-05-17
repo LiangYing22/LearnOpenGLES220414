@@ -45,14 +45,7 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)*3, vertices, GL_STATIC_DRAW);//这里就会把CPU中的数据vertices，传到了GPU的vbo中去。因为此时OpenGL的GL_ARRAY_BUFFER卡槽指向的是刚刚申请的vbo。
     glBindBuffer(GL_ARRAY_BUFFER, 0);//GL_ARRAY_BUFFER 卡槽重新设置到 0 上去，避免后面在 GL_ARRAY_BUFFER 卡槽上的操作污染 我们上面申请的 vbo。
 
-    int fileSize = 0;
-    unsigned char *fileContent = LoadFileContent(sAssetManager, "test.vs", fileSize);
-    GLuint vsShader = CompileShader(GL_VERTEX_SHADER, (char *)fileContent);
-    delete [] fileContent;
-    fileContent = LoadFileContent(sAssetManager, "test.fs", fileSize);
-    GLuint fsShader = CompileShader(GL_FRAGMENT_SHADER, (char *)fileContent);
-    delete [] fileContent;
-    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "vs:%u  fs:%u\n", vsShader, fsShader);
+    program = CreateStandardProgram(sAssetManager, "test.vs", "test.fs");
 
 //    int fileSize = 0;
 //    unsigned char * fileContent = LoadFileContent(sAssetManager, "test.txt", fileSize);
@@ -70,6 +63,6 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceChanged(JNIEnv *env, jo
 }
 extern "C" JNIEXPORT void JNICALL
 Java_com_innup_learnopengles220414_MainActivity_onDrawFrame(JNIEnv *env, jobject thiz) {
-    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "onDrawFrame %f", GetFrameTime());
+//    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "onDrawFrame %f", GetFrameTime());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
