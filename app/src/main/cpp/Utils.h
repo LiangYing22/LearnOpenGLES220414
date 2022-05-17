@@ -4,6 +4,7 @@
 //定义顶点
 struct Vertice{
     float mPosition[4]; //x, y, z, w
+    float mColor[4];//r, g, b, a
 };
 
 unsigned  char* LoadFileContent(AAssetManager *sAssetManager, const char* path, int& fileSize);

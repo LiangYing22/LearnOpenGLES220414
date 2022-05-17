@@ -10,7 +10,7 @@ GLuint program;
 //矩阵索引
 GLint modelMatrixLocation, viewMatrixLocation, projectionMatrixLocation;
 //属性索引
-GLint attrPositionLocation;
+GLint attrPositionLocation, attrColorLocation;
 glm::mat4 modelMatrix, viewMatrix, projectionMatrix;
 
 
@@ -34,16 +34,28 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     vertices[0].mPosition[1] = -0.5f;
     vertices[0].mPosition[2] = -2.0f;
     vertices[0].mPosition[3] = 1.0f;
+    vertices[0].mColor[0] = 1.0f;
+    vertices[0].mColor[1] = 1.0f;
+    vertices[0].mColor[2] = 0.0;
+    vertices[0].mColor[3] = 1.0f;
     //设置第二个顶点数据
     vertices[1].mPosition[0] = 0.5f;
     vertices[1].mPosition[1] = -0.5f;
     vertices[1].mPosition[2] = -2.0f;
     vertices[1].mPosition[3] = 1.0f;
+    vertices[1].mColor[0] = 1.0f;
+    vertices[1].mColor[1] = 0.0f;
+    vertices[1].mColor[2] = 1.0;
+    vertices[1].mColor[3] = 1.0f;
     //设置第三个顶点数据
     vertices[2].mPosition[0] = 0.0f;
     vertices[2].mPosition[1] = 0.5f;
     vertices[2].mPosition[2] = -2.0f;
     vertices[2].mPosition[3] = 1.0f;
+    vertices[2].mColor[0] = 0.0f;
+    vertices[2].mColor[1] = 1.0f;
+    vertices[2].mColor[2] = 1.0;
+    vertices[2].mColor[3] = 1.0f;
 
     glGenBuffers(1, &vbo);//向显卡申请一个 vbo，即在显卡上创建了一个vbo，并把vbo编号赋值到了我们转入的GLuint中。
     glBindBuffer(GL_ARRAY_BUFFER, vbo);//把 vbo 设置到 GL_ARRAY_BUFFER 卡槽上去。
@@ -53,11 +65,12 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     program = CreateStandardProgram(sAssetManager, "test.vs", "test.fs");
     //这些索引应该不为-1。没有使用的变量，拿到的索引会为-1。
     attrPositionLocation = glGetAttribLocation(program, "position");
+    attrColorLocation = glGetAttribLocation(program, "color");
     modelMatrixLocation = glGetUniformLocation(program, "U_ModelMatrix");
     viewMatrixLocation = glGetUniformLocation(program, "U_ViewMatrix");
     projectionMatrixLocation = glGetUniformLocation(program, "U_ProjectionMatrix");
-    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "location %d, %d, %d, %d",
-            attrPositionLocation, modelMatrixLocation, viewMatrixLocation, projectionMatrixLocation);
+    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "location %d, %d, %d, %d, %d",
+            attrPositionLocation, attrColorLocation, modelMatrixLocation, viewMatrixLocation, projectionMatrixLocation);
 
 //    int fileSize = 0;
 //    unsigned char * fileContent = LoadFileContent(sAssetManager, "test.txt", fileSize);
@@ -89,9 +102,11 @@ Java_com_innup_learnopengles220414_MainActivity_onDrawFrame(JNIEnv *env, jobject
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     //设置属性
     glEnableVertexAttribArray(attrPositionLocation);
-    //参数：属性索引、一个点有多少组成部分（x,y,z,w）、每个组成部分是什么类型、第一个顶点数据偏移量多少。
+    //参数：属性索引、一个点有多少组成部分（x,y,z,w）、每个组成部分是什么类型、是否需要转置、每个顶点的大小、在第一个顶点数据偏移量多少。
     //设置这个后，GPU会去vbo取相应数据了
     glVertexAttribPointer(attrPositionLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), 0);
+    glEnableVertexAttribArray(attrColorLocation);
+    glVertexAttribPointer(attrColorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), (void *)(sizeof(float )*4));
     //从0号点开始画，画3个点
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
