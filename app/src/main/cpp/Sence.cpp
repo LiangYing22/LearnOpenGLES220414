@@ -32,7 +32,7 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     //设置第一个顶点数据
     vertices[0].mPosition[0] = -0.5f;
     vertices[0].mPosition[1] = -0.5f;
-    vertices[0].mPosition[2] = -2.0f;
+    vertices[0].mPosition[2] = 0.0f;
     vertices[0].mPosition[3] = 1.0f;
     vertices[0].mColor[0] = 1.0f;
     vertices[0].mColor[1] = 1.0f;
@@ -41,7 +41,7 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     //设置第二个顶点数据
     vertices[1].mPosition[0] = 0.5f;
     vertices[1].mPosition[1] = -0.5f;
-    vertices[1].mPosition[2] = -2.0f;
+    vertices[1].mPosition[2] = 0.0f;
     vertices[1].mPosition[3] = 1.0f;
     vertices[1].mColor[0] = 1.0f;
     vertices[1].mColor[1] = 0.0f;
@@ -50,7 +50,7 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     //设置第三个顶点数据
     vertices[2].mPosition[0] = 0.0f;
     vertices[2].mPosition[1] = 0.5f;
-    vertices[2].mPosition[2] = -2.0f;
+    vertices[2].mPosition[2] = 0.0f;
     vertices[2].mPosition[3] = 1.0f;
     vertices[2].mColor[0] = 0.0f;
     vertices[2].mColor[1] = 1.0f;
@@ -85,9 +85,15 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceChanged(JNIEnv *env, jo
                                                                  jint width, jint height) {
     __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "onSurfaceChanged width:%d,height:%d", width, height);
     glViewport(0, 0, width, height);
+
+    //设置模型矩阵。将三角形往后推两个单位，再缩放0.5倍，再绕Z轴旋转30度
+    modelMatrix = glm::translate(0.0f, 0.0f, -2.0f) * glm::scale(0.5f, 0.5f, 0.5f)
+                        * glm::rotate(30.0f, 1.0f, 0.0f, 0.0f);
+    //设置视口矩阵。放摄像机位置
     viewMatrix=glm::lookAt(glm::vec3(0.0f,0.0f,0.0f),
                            glm::vec3(0.0,0.0,-1.0f),
                            glm::vec3(0.0,1.0f,0.0f));
+    //设置投影矩阵。参数：视角、画布宽与高的比、最近可以看到的距离、最远可以看到的距离
     projectionMatrix=glm::perspective(45.0f,float(width)/float(height),0.1f,1000.0f);
 }
 extern "C" JNIEXPORT void JNICALL
