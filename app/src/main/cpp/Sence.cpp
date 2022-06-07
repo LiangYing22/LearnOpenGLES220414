@@ -11,7 +11,7 @@ GLuint program;
 GLint modelMatrixLocation, viewMatrixLocation, projectionMatrixLocation;
 //属性索引
 GLint attrPositionLocation, attrColorLocation;
-glm::mat4 modelMatrix, viewMatrix, projectionMatrix;
+glm::mat4 modelMatrix, viewMatrix, projectionMatrix, modelMatrix2;
 
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -96,7 +96,8 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceChanged(JNIEnv *env, jo
     glViewport(0, 0, width, height);
 
     //设置模型矩阵。将三角形往后推两个单位
-    modelMatrix = glm::translate(0.0f, 0.0f, -2.0f);
+    modelMatrix = glm::translate(0.0f, 0.0f, -1.0f);
+    modelMatrix2 = glm::translate(30.0f, 0.0f, -2.0f);
 
 //    //设置模型矩阵。将三角形往后推两个单位，再缩放0.5倍，再绕Z轴旋转30度
 //    modelMatrix = glm::translate(0.0f, 0.0f, -2.0f) * glm::scale(0.5f, 0.5f, 0.5f)
@@ -119,6 +120,7 @@ Java_com_innup_learnopengles220414_MainActivity_onDrawFrame(JNIEnv *env, jobject
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glUseProgram(program);
+    glEnable(GL_DEPTH_TEST);
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
@@ -129,7 +131,10 @@ Java_com_innup_learnopengles220414_MainActivity_onDrawFrame(JNIEnv *env, jobject
     glVertexAttribPointer(attrPositionLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), 0);
     glEnableVertexAttribArray(attrColorLocation);
     glVertexAttribPointer(attrColorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), (void *)(sizeof(float )*4));
-    //从0号点开始画，画3个点
+    //从0号点开始画，画4个点
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    //画第二个矩阵
+    glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix2));
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
