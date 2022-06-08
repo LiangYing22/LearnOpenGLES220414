@@ -5,6 +5,8 @@ static AAssetManager *sAssetManager = nullptr;
 
 //vertex buffer object：放顶点缓冲区的一个对象。对硬件来说，数字就是一个明确的东西，所以使用 GLuint 类型。
 GLuint vbo;
+//index buffer object.或者叫做 element array buffer object
+GLuint ibo;
 //shader编译后是GPU的一个程序
 GLuint program;
 //矩阵索引
@@ -65,6 +67,13 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     vertices[3].mColor[1] = 1.0f;
     vertices[3].mColor[2] = 1.0;
     vertices[3].mColor[3] = 1.0f;
+
+    //每三个索引会组成一个三角形：0,1,2号点组成一个三角形；1，3,2号点组成一个三角形
+    unsigned short indexes[] = {0, 1, 2, 1, 3, 2};
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short )*6, indexes, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     glGenBuffers(1, &vbo);//向显卡申请一个 vbo，即在显卡上创建了一个vbo，并把vbo编号赋值到了我们转入的GLuint中。
     glBindBuffer(GL_ARRAY_BUFFER, vbo);//把 vbo 设置到 GL_ARRAY_BUFFER 卡槽上去。
@@ -131,11 +140,15 @@ Java_com_innup_learnopengles220414_MainActivity_onDrawFrame(JNIEnv *env, jobject
     glVertexAttribPointer(attrPositionLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), 0);
     glEnableVertexAttribArray(attrColorLocation);
     glVertexAttribPointer(attrColorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), (void *)(sizeof(float )*4));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
     //从0号点开始画，画4个点
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     //画第二个矩阵
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix2));
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
 }
