@@ -71,6 +71,21 @@ GLuint CreateStandardProgram(AAssetManager *sAssetManager, const char *vertex_sh
     return program;
 }
 
+GLuint CreateBufferObject(GLenum type, void *data, int size, GLenum usage){
+    GLuint object_to_ret;
+    glGenBuffers(1, &object_to_ret);
+    glBindBuffer(type, object_to_ret);
+    glBufferData(type, size, data, usage);
+    glBindBuffer(type, 0);
+    return object_to_ret;
+}
+
+void UpdateBufferObject(GLuint object, GLenum type, void *data, int size, int offset){
+    glBindBuffer(type, object);
+    glBufferSubData(type, offset, size, data);
+    glBindBuffer(type, 0);
+}
+
 float GetFrameTime(){
     //无论这个函数执行多少次，下面 static 初始化代码只会执行一次
     static unsigned long long lastTime = 0, currentTime = 0;
