@@ -80,6 +80,71 @@ GLuint CreateBufferObject(GLenum type, void *data, int size, GLenum usage){
     return object_to_ret;
 }
 
+/**
+ * 实现一个像素的RB交换。bgr->rgb
+ * @param pixel 像素数据
+ * @param pixel_data_offset b分量偏移位置
+ */
+void SwapPixelRB(unsigned char * pixel,int pixel_data_offset){//bgr -> rgb
+    unsigned  char b=pixel[pixel_data_offset];
+    pixel[pixel_data_offset]=pixel[pixel_data_offset+2];
+    pixel[pixel_data_offset+2]=b;
+}
+
+/**
+ * 解码24位非压缩格式的位图文件
+ * @param bmp_fileContent 文件内容
+ * @param width 解码后赋值的宽
+ * @param height 解码后赋值的高
+ * @return 解码后的像素数据
+ */
+unsigned char* DecodeBMP(unsigned  char* bmp_file_content, int& width, int& height){
+    //取出文件的两个字节(short占两个字节，解short指针就可以得出2个字节内容，所以强转short指针再解)，
+    //判断这两个字节是不是等于 0x4042，等于的话，说明是位图文件
+    if(0x4D42==*((unsigned short*)bmp_file_content)){
+        //24位非压缩格式的位图文件开始指针地址偏移10个单位指向的是像素数据的偏移地址。
+        //即：解 开始指针地址后10位的这个指针，得出像素真正地址的偏移量
+        int pixel_data_offset=*((int*)(bmp_file_content+10));
+        //开始指针地址后18位的这个指针存放着图片“宽”的数据
+        width=*((int*)(bmp_file_content+18));
+        //开始指针地址后22位的这个指针存放着图片“宽”的数据
+        height=*((int*)(bmp_file_content+22));
+        //用开始指针地址加上数据偏移量，得到的地址就是像素数据的地址，即像素数据的指针。
+        unsigned char * pixel=bmp_file_content+pixel_data_offset;
+        //图片宽*高得到所有的像素数据大小。其中一个像素占3个字节，即bgr。
+        int pixel_data_count=width*height;
+        //变量这个数组，每三个为一组，交换每组的RB值，让每组数据变成 rgb。
+        for (int i = 0; i < pixel_data_count; ++i) {
+                SwapPixelRB(pixel,i*3);//每个像素占三个字节
+        }
+        return pixel;
+    }
+    return nullptr;
+}
+
+GLuint CreateTexture2D(void*pixel,int width,int height,GLenum gpu_format,GLenum cpu_format){
+    GLuint texture;
+    glGenTextures(1,&texture);
+    glBindTexture(GL_TEXTURE_2D,texture);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D,0,gpu_format,width,height,0,cpu_format,GL_UNSIGNED_BYTE,pixel);
+    glBindTexture(GL_TEXTURE_2D,0);
+    return texture;
+}
+
+GLuint CreateTextureFromFile(AAssetManager *sAssetManager, const char *path){
+    int file_size=0;
+    unsigned char* filecontent=LoadFileContent(sAssetManager, path,file_size);
+    int image_width,image_height;
+    unsigned char * rgb_pixel=DecodeBMP(filecontent,image_width,image_height);
+    GLuint texture=CreateTexture2D(rgb_pixel,image_width,image_height,GL_RGB,GL_RGB);
+    delete [] filecontent;
+    return texture;
+}
+
 void UpdateBufferObject(GLuint object, GLenum type, void *data, int size, int offset){
     glBindBuffer(type, object);
     glBufferSubData(type, offset, size, data);

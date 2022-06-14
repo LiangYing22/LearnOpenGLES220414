@@ -11,8 +11,10 @@ GLuint ibo;
 GLuint program;
 //矩阵索引
 GLint modelMatrixLocation, viewMatrixLocation, projectionMatrixLocation;
+//纹理
+GLuint texture;
 //属性索引
-GLint attrPositionLocation, attrColorLocation;
+GLint attrPositionLocation, attrTexCoordLocation;
 glm::mat4 modelMatrix, viewMatrix, projectionMatrix, modelMatrix2;
 
 
@@ -32,41 +34,41 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
     //定义三个顶点（每个顶点有四个坐标），此时定位的数据还在 CPU 上。
     Vertice vertices[4];
     //设置第一个顶点数据
-    vertices[0].mPosition[0] = -50.0f;
-    vertices[0].mPosition[1] = -50.0f;
+    vertices[0].mPosition[0] = -128.0f;
+    vertices[0].mPosition[1] = -128.0f;
     vertices[0].mPosition[2] = 0.0f;
     vertices[0].mPosition[3] = 1.0f;
-    vertices[0].mColor[0] = 1.0f;
-    vertices[0].mColor[1] = 1.0f;
-    vertices[0].mColor[2] = 0.0;
-    vertices[0].mColor[3] = 1.0f;
+    vertices[0].mTexcoord[0] = 0.0f;
+    vertices[0].mTexcoord[1] = 0.0f;
+    vertices[0].mTexcoord[2] = 0.0;
+    vertices[0].mTexcoord[3] = 0.0f;
     //设置第二个顶点数据
-    vertices[1].mPosition[0] = 50.0f;
-    vertices[1].mPosition[1] = -50.0f;
+    vertices[1].mPosition[0] = 128.0f;
+    vertices[1].mPosition[1] = -128.0f;
     vertices[1].mPosition[2] = 0.0f;
     vertices[1].mPosition[3] = 1.0f;
-    vertices[1].mColor[0] = 1.0f;
-    vertices[1].mColor[1] = 0.0f;
-    vertices[1].mColor[2] = 1.0;
-    vertices[1].mColor[3] = 1.0f;
+    vertices[1].mTexcoord[0] = 1.0f;
+    vertices[1].mTexcoord[1] = 0.0f;
+    vertices[1].mTexcoord[2] = 0.0;
+    vertices[1].mTexcoord[3] = 0.0f;
     //设置第三个顶点数据
-    vertices[2].mPosition[0] = -50.0f;
-    vertices[2].mPosition[1] = 50.0f;
+    vertices[2].mPosition[0] = -128.0f;
+    vertices[2].mPosition[1] = 128.0f;
     vertices[2].mPosition[2] = 0.0f;
     vertices[2].mPosition[3] = 1.0f;
-    vertices[2].mColor[0] = 0.0f;
-    vertices[2].mColor[1] = 1.0f;
-    vertices[2].mColor[2] = 1.0;
-    vertices[2].mColor[3] = 1.0f;
+    vertices[2].mTexcoord[0] = 0.0f;
+    vertices[2].mTexcoord[1] = 1.0f;
+    vertices[2].mTexcoord[2] = 0.0;
+    vertices[2].mTexcoord[3] = 0.0f;
     //设置第四个顶点数据
-    vertices[3].mPosition[0] = 50.0f;
-    vertices[3].mPosition[1] = 50.0f;
+    vertices[3].mPosition[0] = 128.0f;
+    vertices[3].mPosition[1] = 128.0f;
     vertices[3].mPosition[2] = 0.0f;
     vertices[3].mPosition[3] = 1.0f;
-    vertices[3].mColor[0] = 0.0f;
-    vertices[3].mColor[1] = 1.0f;
-    vertices[3].mColor[2] = 1.0;
-    vertices[3].mColor[3] = 1.0f;
+    vertices[3].mTexcoord[0] = 1.0f;
+    vertices[3].mTexcoord[1] = 1.0f;
+    vertices[3].mTexcoord[2] = 0.0;
+    vertices[3].mTexcoord[3] = 0.0f;
 
     //每三个索引会组成一个三角形：0,1,2号点组成一个三角形；1，3,2号点组成一个三角形
     unsigned short indexes[] = {0, 1, 2, 1, 3, 2};
@@ -82,15 +84,18 @@ Java_com_innup_learnopengles220414_MainActivity_onSurfaceCreated(JNIEnv *env, jo
 //    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)*4, vertices, GL_STATIC_DRAW);//这里就会把CPU中的数据vertices，传到了GPU的vbo中去。因为此时OpenGL的GL_ARRAY_BUFFER卡槽指向的是刚刚申请的vbo。
 //    glBindBuffer(GL_ARRAY_BUFFER, 0);//GL_ARRAY_BUFFER 卡槽重新设置到 0 上去，避免后面在 GL_ARRAY_BUFFER 卡槽上的操作污染 我们上面申请的 vbo。
 
+    texture = CreateTextureFromFile(sAssetManager, "front.bmp");
+    __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "texture %d", texture);
+
     program = CreateStandardProgram(sAssetManager, "test.vs", "test.fs");
     //这些索引应该不为-1。没有使用的变量，拿到的索引会为-1。
     attrPositionLocation = glGetAttribLocation(program, "position");
-    attrColorLocation = glGetAttribLocation(program, "color");
+    attrTexCoordLocation = glGetAttribLocation(program, "texcoord");
     modelMatrixLocation = glGetUniformLocation(program, "U_ModelMatrix");
     viewMatrixLocation = glGetUniformLocation(program, "U_ViewMatrix");
     projectionMatrixLocation = glGetUniformLocation(program, "U_ProjectionMatrix");
     __android_log_print(ANDROID_LOG_INFO, ALICE_LOG_TAG, "location %d, %d, %d, %d, %d",
-            attrPositionLocation, attrColorLocation, modelMatrixLocation, viewMatrixLocation, projectionMatrixLocation);
+            attrPositionLocation, attrTexCoordLocation, modelMatrixLocation, viewMatrixLocation, projectionMatrixLocation);
 
 //    int fileSize = 0;
 //    unsigned char * fileContent = LoadFileContent(sAssetManager, "test.txt", fileSize);
@@ -132,6 +137,9 @@ Java_com_innup_learnopengles220414_MainActivity_onDrawFrame(JNIEnv *env, jobject
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glUseProgram(program);
     glEnable(GL_DEPTH_TEST);
+//    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+//    glUniform1i(glGetUniformLocation(program, "U_Texture"), 0);
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
@@ -140,16 +148,17 @@ Java_com_innup_learnopengles220414_MainActivity_onDrawFrame(JNIEnv *env, jobject
     //参数：属性索引、一个点有多少组成部分（x,y,z,w）、每个组成部分是什么类型、是否需要转置、每个顶点的大小、在第一个顶点数据偏移量多少。
     //设置这个后，GPU会去vbo取相应数据了
     glVertexAttribPointer(attrPositionLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), 0);
-    glEnableVertexAttribArray(attrColorLocation);
-    glVertexAttribPointer(attrColorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), (void *)(sizeof(float )*4));
+    glEnableVertexAttribArray(attrTexCoordLocation);
+    glVertexAttribPointer(attrTexCoordLocation, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), (void *)(sizeof(float )*4));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
     //从0号点开始画，画4个点
 //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     //画第二个矩阵
-    glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix2));
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+//    glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix2));
+//    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
